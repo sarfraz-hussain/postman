@@ -1,0 +1,739 @@
+{
+	"info": {
+		"_postman_id": "f9704cd2-1d2c-4a86-9dd8-d98cc0386b0b",
+		"name": "Ware House Tracking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Request for Login and get AccessCode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "81fcb591-3243-49ee-82b3-b8f851221830",
+						"exec": [
+							"pm.test(\"Status code is 200\", function (){",
+							"    pm.response.to.have.status(200);",
+							"    if(pm.response.code == 200 && pm.response.status == \"OK\" )",
+							"{",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"acessToken\", jsonData.access_token);",
+							"    pm.environment.set(\"refreshToken\", jsonData.refresh_token);",
+							"}",
+							"",
+							"});",
+							"",
+							"",
+							"const schema = {",
+							"    \"type\" : \"object\", ",
+							"    \"properties\":{",
+							"                    \"access_token\":{\"type\": \"string\", \"maxLength\" : 30, \"minLength\" : 30 },",
+							"                    \"expires_in\":{\"type\": \"integer\", \"maxLength\" : 36000, \"minLength\" : 1 },",
+							"                    \"token_type\":{\"type\": \"string\", \"maxLength\" : 255},",
+							"                    \"scope\":{\"type\": \"string\", \"maxLength\" : 255, \"minLength\" : 1},",
+							"                    \"refresh_token\":{\"type\": \"string\", \"maxLength\" : 30, \"minLength\" : 30 }",
+							"                },",
+							"                ",
+							"    \"required\": [\"access_token\", \"expires_in\", \"token_type\", \"scope\", \"refresh_token\" ],",
+							"    \"additionalProperties\" : false",
+							"            ",
+							"};",
+							"",
+							"",
+							"pm.test(\"Verify Schema\", function () {",
+							"    pm.response.to.have.jsonSchema(schema);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					},
+					{
+						"key": "Pragma",
+						"value": "no-cache"
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Sec-Fetch-Dest",
+						"value": "empty"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic M3BYV3VGRmcxOHZqM1NMNDZXRENwWjE0dEZDMVhsOW91c0c4WjRsdTpibTFUanNkM2F3bTNrM1ppbElzT0IzUXoxUWJLT3JuRmZ6eFV2TGdHdGpHRHN3SXpLNVQ3ZGpSVFZZTmNPM25YT3RhY3EzUnRLd00yaThkWkJ4dGt3MU9udzNqY2o5R1ZEWlV1SjBNUHBaSjdDZ3JXdk9Lc1J1NTBiSkhCcGZTbg=="
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Origin",
+						"value": "https://wts.cs-satms.com:8445"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-site"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Referer",
+						"value": "https://wts.cs-satms.com:8445/login"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-PK,en-US;q=0.9,en;q=0.8,ur;q=0.7"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "wts-admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "wts-admin",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/o/token/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"o",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}/api/devices/",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d54263d2-3cf9-46fb-8fbe-67430da65494",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "81aaa236-607a-4601-93f9-2943fe0bd197",
+						"exec": [
+							"//Verify Status Code",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"",
+							"//Verify Schema",
+							"const schema = {",
+							"    \"type\" : \"object\", ",
+							"    \"properties\":{",
+							"                    \"count\":{\"type\": \"integer\"},",
+							"                    \"next\":{ /*\"type\": \"string\",*/  \"x-nullable\": true },",
+							"                    \"previous\":{ /*\"type\": \"string\",*/ \"x-nullable\": true },",
+							"                    \"results\":{ \"type\": \"array\",",
+							"                                \"items\":{",
+							"                                         \"additionalProperties\": false,",
+							"                                         \"type\": \"object\",",
+							"                                         \"properties\":{",
+							"                                                       \"id\":{ \"type\": \"integer\",   \"readOnly\": true },",
+							"                                                        \"device_id\":{\"type\": \"string\", \"maxLength\" : 255, \"minLength\" : 1 },",
+							"                                                        \"status\":{\"type\": \"string\", \"maxLength\" : 255, \"x-nullable\": true },",
+							"                                                        \"api_key\":{\"type\": \"string\", \"maxLength\" : 255, \"minLength\" : 1 },",
+							"                                                        \"device_name\":{\"type\": \"string\", \"maxLength\": 255, \"minLength\" : 1},",
+							"                                                        \"timestamp\":{\"type\":\"integer\", \"maxLength\":2147483647,\"minLength\":1},",
+							"                                                    }, \"required\": [\"id\", \"device_id\", \"status\", \"api_key\", \"device_name\", \"timestamp\" ],",
+							"                            ",
+							"                                        },",
+							"                        ",
+							"                               },    ",
+							"",
+							"                        ",
+							"                  },",
+							"                  ",
+							"                    \"required\": [\"count\", \"next\", \"previous\" ],",
+							"                    \"additionalProperties\" : false",
+							"                    ",
+							"                };",
+							"",
+							"pm.test(\"Verify Schema\", function () {",
+							"    pm.response.to.have.jsonSchema(schema);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{acessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/devices/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"devices",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}/api/devices/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c35c8ef2-3ddb-490f-a24e-a65bf73df081",
+						"exec": [
+							"// To verify Status Code",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"//To log ID of device created in this request",
+							"if(pm.response.code == 201 && pm.response.status == \"Created\" )",
+							"{",
+							"    let jsonData = pm.response.json();",
+							"    pm.environment.set(\"lastCreatedDeviceID\", jsonData.id);",
+							"}",
+							"",
+							"// Verify JSON Schema",
+							"const schema = {",
+							"    \"type\" : \"object\", ",
+							"    \"properties\":{",
+							"                    \"id\":{\"type\": \"integer\", \"readOnly\": true },",
+							"                    \"device_id\":{\"type\": \"string\", \"maxLength\" : 255, \"minLength\" : 1 },",
+							"                    \"status\":{\"type\": \"string\", \"maxLength\" : 255, \"x-nullable\": true },",
+							"                    \"api_key\":{\"type\": \"string\", \"maxLength\" : 255, \"minLength\" : 1 },",
+							"                    \"device_name\":{\"type\": \"string\", \"maxLength\" : 255, \"minLength\" : 1 },",
+							"                    \"timestamp\":{\"type\": \"integer\", \"maxLength\" : 2147483647, \"minLength\" : 1 }",
+							"",
+							"                },",
+							"    \"required\": [\"id\", \"device_id\", \"status\", \"api_key\", \"device_name\", \"timestamp\" ],",
+							"    \"additionalProperties\" : false",
+							"            ",
+							"};",
+							"",
+							"pm.test(\"Verify Schema\", function () {",
+							"    pm.response.to.have.jsonSchema(schema);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{acessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\n    \"device_id\": \"D002\",\n    \"status\": \"Acive\",\n    \"api_key\": \"YV0u2UKPpT5yab\",\n    \"device_name\": \"Device Name 2\",\n    \"timestamp\": 1585027670\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/devices/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"devices",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}/api/devices/{id}/",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1b2715e5-bc81-4325-a592-7531d086dd20",
+						"exec": [
+							"pm.environment.set(\"deviceID\", pm.environment.get(\"lastCreatedDeviceID\"));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4d15cbdd-c5b3-4d04-9064-47f7cc8bbba4",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"const schema = {",
+							"    \"type\" : \"object\", ",
+							"    \"properties\":{",
+							"                    \"id\":{",
+							"                            \"type\": \"integer\",",
+							"                            \"readOnly\": true",
+							"                        },",
+							"                    \"device_id\":{",
+							"                            \"type\": \"string\",",
+							"                            \"maxLength\" : 255,",
+							"                            \"minLength\" : 1",
+							"                        },",
+							"                    \"status\":{",
+							"                            \"type\": \"string\",",
+							"                            \"maxLength\" : 255,",
+							"                            \"x-nullable\": true",
+							"                        },",
+							"                    \"api_key\":{",
+							"                            \"type\": \"string\",",
+							"                            \"maxLength\" : 255,",
+							"                            \"minLength\" : 1",
+							"                        },",
+							"                    \"device_name\":{",
+							"                            \"type\": \"string\",",
+							"                            \"maxLength\" : 255,",
+							"                            \"minLength\" : 1",
+							"                        },",
+							"                    \"timestamp\":{",
+							"                            \"type\": \"integer\",",
+							"                            \"maxLength\" : 2147483647,",
+							"                            \"minLength\" : 1",
+							"                        }",
+							"                    ",
+							"                },",
+							"    ",
+							"",
+							"                ",
+							"                ",
+							"    \"required\": [\"id\", \"device_id\", \"status\", \"api_key\", \"device_name\", \"timestamp\" ],",
+							"    \"additionalProperties\" : false",
+							"            ",
+							"};",
+							"",
+							"",
+							"pm.test(\"Verify Schema\", function () {",
+							"    pm.response.to.have.jsonSchema(schema);",
+							"});",
+							"",
+							"/*if(pm.response.code == 200 && pm.response.status == \"OK\" )",
+							"{",
+							"    pm.sendRequest({",
+							"    ",
+							"    url: \"https://wts.cs-satms.com:8443/api/devices/86/\",",
+							"    method: \"DELETE\",",
+							"    header: {",
+							"               // \"Content-Length\": \"1\",",
+							"                \"Authorization\": \"Bearer 1yag1CT9KxtkFeT7PyG4X03Mn17iKF\",",
+							"                //\"Content-Type\": \"application/json\"",
+							"            },",
+							"    body:   {",
+							"            },",
+							"    });",
+							"}*/",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{acessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "id",
+						"value": "69",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/devices/{{deviceID}}/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"devices",
+						"{{deviceID}}",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}/api/devices/{id}/",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1b2715e5-bc81-4325-a592-7531d086dd20",
+						"exec": [
+							"pm.environment.set(\"deviceID\", pm.environment.get(\"lastCreatedDeviceID\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4d15cbdd-c5b3-4d04-9064-47f7cc8bbba4",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{acessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "id",
+						"value": "69",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/devices/{{deviceID}}/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"devices",
+						"{{deviceID}}",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}/api/devices/{id}/  Negative Case",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1b2715e5-bc81-4325-a592-7531d086dd20",
+						"exec": [
+							"pm.environment.set(\"deviceID\", pm.environment.get(\"lastCreatedDeviceID\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4d15cbdd-c5b3-4d04-9064-47f7cc8bbba4",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"const schema = {",
+							"    \"type\" : \"object\", ",
+							"    \"properties\":{",
+							"                    \"detail\":{\"type\": \"string\"}",
+							"                },",
+							"                ",
+							"    \"required\": [\"detail\" ],",
+							"    \"additionalProperties\" : false",
+							"            ",
+							"};",
+							"pm.test(\"Verify Schema\", function () {",
+							"    pm.response.to.have.jsonSchema(schema);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{acessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "id",
+						"type": "text",
+						"value": "69",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/devices/{{deviceID}}/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"devices",
+						"{{deviceID}}",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}/api/sites/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4527e4ec-2bcd-4fae-af27-9439e80a2b80",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{acessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/api/sites/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"sites",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "0dcb0482-433f-4a81-be48-481e0a24d401",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "de2554a2-e720-4430-8918-209be902d4f7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "c851d0c9-1a3c-47fe-b2d1-ccce52186918",
+			"key": "userName",
+			"value": "wts-admin",
+			"type": "string"
+		},
+		{
+			"id": "84a162a5-10bf-46f6-af79-7004806e4f23",
+			"key": "passWord",
+			"value": "wts-admin",
+			"type": "string"
+		},
+		{
+			"id": "43fb8eaa-a3f1-41c3-bfb8-11b65ac7efe4",
+			"key": "Authorization",
+			"value": "d3RzLWFkbWluOnd0cy1hZG1pbg==",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
